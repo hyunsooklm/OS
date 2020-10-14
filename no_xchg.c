@@ -2,19 +2,28 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <stdlib.h>
-#include <semaphore.h>
 #define man 10000
 int bank_money = 100 * man;
-sem_t bin_sem;
+
 
 void enter_region() { 
-sem_wait(&bin_sem); //-1한다. num<0 -> loop	
+	/*asm(
+	".data\n"
+	"lock:\n"
+	".byte 0\n"
+	".text\n"
+	"_enter_region:\n"
+	"movb $1, %al\n" // move 1 to AL
+	"xchgb lock,%al\n"
+	"cmp $0, %al\n" 
+	"jne _enter_region\n"
+	);*/
 }
-//대기장소
+
 
 
 void leave_region() { //다빌렸다!
-sem_post(&bin_sem);
+	//    asm("movb $0, lock");
 }
 
 
@@ -28,7 +37,7 @@ else
 {
 printf("before borrow bank_money:%d\n",bank_money);
 bank_money -= borrow_money;
-printf("%s는 %d를 빌린다.\n", p, borrow_money);
+printf("%s는 %d을 빌린다.\n", p, borrow_money);
 printf("대출 후 은행잔액:%d\n", bank_money);
 int d = rand() % 1000000;
 usleep(d);
@@ -38,7 +47,7 @@ usleep(d);
 
 
 void noncritical_region(char* p,int payback_money,int borrow_money) { //돈쓰는구간,
-printf("%s는 은행에 %d를 갚는다.\n", p, payback_money);
+printf("%s 는 %d을 갚는다.\n", p, payback_money);
 printf("%s의 남은 대출금액:%d",p,borrow_money);
 bank_money+=payback_money;    
 printf("대출금 회수 후 은행잔액:%d\n", bank_money);
@@ -55,14 +64,14 @@ int borrow_num=0; //대출횟수 10번까지만
 int temp;
 do {
 if(borrow_num<10){
-puts("f1 wait");
+puts("f1 wait\n");
 enter_region();
 if (bank_money >= 10000) {
 temp = (rand() % (bank_money / man) + 1) * man; //10000~은행보유금액까지
 borrow_money+=temp;
-printf("IN CS f1 start borrow\n");
+printf("IN CS, 1 start borrow \n");
 critical_region(p, temp);
-printf("CS END\n");
+printf("CS END.\n");
 leave_region();
 borrow_num++;
 }
@@ -90,7 +99,7 @@ temp = (rand() % (bank_money / man) + 1) * man; //10000~은행보유금액까지
 borrow_money+=temp;
 printf("IN CS f2 start borrow\n");
 critical_region(p, temp);
-printf("CS END\n");
+printf("CS END.\n");
 leave_region();
 }
 } //돈빌리는 부분, 은행이 최소 10000원 이상은 있어야 빌릴수있다.
@@ -145,7 +154,7 @@ temp = (rand() % (bank_money / man) + 1) * man; //10000~은행보유금액까지
 borrow_money+=temp;
 printf("IN CS f4 start borrow\n");
 critical_region(p, temp);
-printf("CS END\n");
+printf("CS end\n");
 leave_region();
 borrow_num++;
 }
@@ -167,7 +176,7 @@ int borrow_num=0;
 int temp;
 do {
 if(borrow_num<10){
-puts("f5 wait\n");
+puts("f5 wait");
 enter_region();
 if (bank_money >= 10000) {
 temp = (rand() % (bank_money / man) + 1) * man; //10000~은행보유금액까지
@@ -192,7 +201,6 @@ return NULL;
 
 int main() {
 int rc;
-sem_init(&bin_sem,0,1);
 pthread_t t1, t2,t3,t4,t5;
 rc = pthread_create(&t1, NULL, f1, "f1");
 if (rc != 0) {
@@ -224,7 +232,6 @@ pthread_join(t2, NULL);
 pthread_join(t3, NULL);
 pthread_join(t4, NULL);
 pthread_join(t5, NULL);
-sem_destroy(&bin_sem);
 puts("All threads finished.");
 return 0;
 }

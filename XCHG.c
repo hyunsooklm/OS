@@ -37,8 +37,8 @@ else
 {
 printf("before borrow bank_money:%d\n",bank_money);
 bank_money -= borrow_money;
-printf("%s borrow %d in bank\n", p, borrow_money);
-printf("은행잔액:%d\n", bank_money);
+printf("%s는 %d을 빌린다.\n", p, borrow_money);
+printf("대출 후 은행잔액:%d\n", bank_money);
 int d = rand() % 1000000;
 usleep(d);
 }
@@ -47,10 +47,10 @@ usleep(d);
 
 
 void noncritical_region(char* p,int payback_money,int borrow_money) { //돈쓰는구간,
-printf("%s payback %d\n", p, payback_money);
+printf("%s 는 %d을 갚는다.\n", p, payback_money);
 printf("%s의 남은 대출금액:%d",p,borrow_money);
 bank_money+=payback_money;    
-printf("은행잔액:%d\n", bank_money);
+printf("대출금 회수 후 은행잔액:%d\n", bank_money);
 int d = rand() % 1000000;
 usleep(d);
 }
@@ -64,14 +64,14 @@ int borrow_num=0; //대출횟수 10번까지만
 int temp;
 do {
 if(borrow_num<10){
-puts("f1 wait for another process");
+puts("f1 wait\n");
 enter_region();
 if (bank_money >= 10000) {
 temp = (rand() % (bank_money / man) + 1) * man; //10000~은행보유금액까지
 borrow_money+=temp;
-printf("f1 start its critical section\n");
+printf("IN CS, 1 start borrow \n");
 critical_region(p, temp);
-printf("f1 end its critical section\n");
+printf("CS END.\n");
 leave_region();
 borrow_num++;
 }
@@ -92,14 +92,14 @@ int borrow_num=0;
 int temp;
 do {
 if(borrow_num<10){
-puts("f2 wait for another process");
+puts("f2 wait\n");
 enter_region();
 if (bank_money >= 10000) {
 temp = (rand() % (bank_money / man) + 1) * man; //10000~은행보유금액까지
 borrow_money+=temp;
-printf("f2 start its critical section\n");
+printf("IN CS f2 start borrow\n");
 critical_region(p, temp);
-printf("f2 end its critical section\n");
+printf("CS END.\n");
 leave_region();
 }
 } //돈빌리는 부분, 은행이 최소 10000원 이상은 있어야 빌릴수있다.
@@ -119,14 +119,14 @@ int borrow_num=0;
 int temp;
 do {
 if(borrow_num<10){
-puts("f3 wait for another process");
+puts("f3 wait\n");
 enter_region();
 if (bank_money >= 10000) {
 temp = (rand() % (bank_money / man) + 1) * man; //10000~은행보유금액까지
 borrow_money+=temp;
-printf("f3 start its critical section\n");
+printf("IN CS f3 start borrow\n");
 critical_region(p, temp);
-printf("f3 end its critical section\n");
+printf("CS END\n");
 leave_region();
 borrow_num++;
 } //돈빌리는 부분, 은행이 최소 10000원 이상은 있어야 빌릴수있다.
@@ -147,14 +147,14 @@ int borrow_num=0;
 int temp;
 do {
 if(borrow_num<10){
-puts("f4 wait for another process");
+puts("f4 wait\n");
 enter_region();
 if (bank_money >= 10000) {
 temp = (rand() % (bank_money / man) + 1) * man; //10000~은행보유금액까지
 borrow_money+=temp;
-printf("f4 start its critical section\n");
+printf("IN CS f4 start borrow\n");
 critical_region(p, temp);
-printf("f4 end its critical section\n");
+printf("CS end\n");
 leave_region();
 borrow_num++;
 }
@@ -176,14 +176,14 @@ int borrow_num=0;
 int temp;
 do {
 if(borrow_num<10){
-puts("f5 wait for another process");
+puts("f5 wait");
 enter_region();
 if (bank_money >= 10000) {
 temp = (rand() % (bank_money / man) + 1) * man; //10000~은행보유금액까지
 borrow_money+=temp;
-printf("f5 start its critical section\n");
+printf("IN CS f5 start borrow\n");
 critical_region(p, temp);
-printf("f5 end its critical section\n");
+printf("CS END\n");
 leave_region();
 borrow_num++;
 }
