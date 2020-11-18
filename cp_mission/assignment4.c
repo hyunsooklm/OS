@@ -84,7 +84,7 @@ void main(int argc,char *argv[])
 			printf("dir copy only!");
 			exit(1);
 		} //argv[1] must be directory.
-		else if(dirYesNo(argv[1]==1 && dirYesNo(argv[2])!=1)){
+		else if(dirYesNo(argv[1])==1 && dirYesNo(argv[2])!=1){
 			if(stat(argv[2],&st)==-1){ //dir- not exist_dir
 				mkdir(argv[2],0766);
 			}
